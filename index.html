@@ -1433,17 +1433,8 @@ function renderForum(){
     </div>`).join('');
 }
 
-// ── Supabase 配置（替换 Google Apps Script）──────────────────
-const SUPA_URL = 'https://hpbeobajzzbufpwrcita.supabase.co';
-const SUPA_KEY = 'sb_publishable_TmjH5fWvpm41NuM03lJNmQ_KQg4RDMi';
-const SUPA_HEADERS = {
-  'apikey': SUPA_KEY,
-  'Authorization': 'Bearer ' + SUPA_KEY,
-  'Content-Type': 'application/json',
-  'Prefer': 'return=representation'
-};
-
 // THREAD & COMMENTS
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuzsAW58LyAWZ_v7pVyjN1dJMNS2Ek8QLbCqXQOXO6HjhbyepCnY3RmD5fM6WfV5ge/exec';
 let currentTopicId = '';
 
 function openThread(topic){
@@ -1466,9 +1457,7 @@ function loadComments(topicId){
   const empty = document.getElementById('comments-empty');
   const countEl = document.getElementById('comment-count');
   list.innerHTML=''; loading.classList.remove('hidden'); empty.classList.add('hidden');
-  fetch(`${SUPA_URL}/rest/v1/comments?topic_id=eq.${encodeURIComponent(topicId)}&order=created_at.asc`, {
-    headers: SUPA_HEADERS
-  })
+  fetch(APPS_SCRIPT_URL + '?topic_id=' + encodeURIComponent(topicId))
     .then(r=>r.json())
     .then(rows=>{
       loading.classList.add('hidden');
@@ -1479,7 +1468,7 @@ function loadComments(topicId){
           <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">
             <span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600">${escHtml(c.name||'Anonymous')}</span>
             ${c.grade?`<span style="font-size:11px;color:var(--ink3);font-family:'Source Serif 4',serif;letter-spacing:.08em">${escHtml(c.grade)}</span>`:''}
-            <span style="font-size:11px;color:var(--ink4);font-family:'Source Serif 4',serif;margin-left:auto">${formatDate(c.created_at)}</span>
+            <span style="font-size:11px;color:var(--ink4);font-family:'Source Serif 4',serif;margin-left:auto">${formatDate(c.timestamp)}</span>
           </div>
           <div style="font-size:15px;color:var(--ink2);line-height:1.8">${escHtml(c.content||'').replace(/\n/g,'<br>')}</div>
         </div>`).join('');
@@ -1502,19 +1491,25 @@ function submitComment(){
   if(!content){errEl.textContent=t('Please write a comment.','请填写留言内容。');return;}
   if(content.length<10){errEl.textContent=t('Comment is too short (min 10 characters).','留言太短，请至少写10个字。');return;}
   btn.disabled=true; btn.textContent=t('Posting…','发布中…');
-  fetch(`${SUPA_URL}/rest/v1/comments`, {
+  // Use no-cors mode to avoid CORS issues with Apps Script
+  const formData = new FormData();
+  formData.append('topic_id', currentTopicId);
+  formData.append('name', name);
+  formData.append('grade', grade);
+  formData.append('content', content);
+  fetch(APPS_SCRIPT_URL, {
     method:'POST',
-    headers: SUPA_HEADERS,
-    body: JSON.stringify({ topic_id: currentTopicId, name, grade, content })
+    mode:'no-cors',
+    body: formData
   })
-  .then(r=>{ if(!r.ok) throw new Error('Failed'); return r.json(); })
   .then(()=>{
+    // no-cors means we can't read the response, but if no error thrown it worked
     sucEl.classList.remove('hidden');
-    sucEl.textContent=t('✓ Comment posted!','✓ 留言成功！');
+    sucEl.textContent=t('✓ Comment posted! Reloading…','✓ 留言成功！正在刷新…');
     document.getElementById('comment-name').value='';
     document.getElementById('comment-grade').value='';
     document.getElementById('comment-text').value='';
-    setTimeout(()=>loadComments(currentTopicId), 1000);
+    setTimeout(()=>loadComments(currentTopicId), 2000);
   })
   .catch(()=>{ errEl.textContent=t('Network error. Please try again.','网络错误，请重试。'); })
   .finally(()=>{ btn.disabled=false; btn.textContent=t('Post Comment →','发布留言 →'); });
@@ -1606,37 +1601,36 @@ function subscribeEmail(){
   }).catch(()=>{msg.style.color='var(--red)';msg.textContent=t('Network error. Please try again.','网络错误，请重试。');});
 }
 
-// LIKES (Supabase)
+// LIKES
 const LIKED_KEY='youthink_liked';
+const LOCAL_LIKES_KEY='youthink_local_likes';
 let allLikes={};
-
-// 页面加载时从 Supabase 拉取所有点赞数
-async function fetchLikeCounts(){
-  try{
-    const r = await fetch(`${SUPA_URL}/rest/v1/likes?select=essay_id`, { headers: SUPA_HEADERS });
-    const rows = await r.json();
-    allLikes={};
-    rows.forEach(row=>{ allLikes[row.essay_id]=(allLikes[row.essay_id]||0)+1; });
-  }catch{}
-}
-
 function getLiked(){try{return JSON.parse(localStorage.getItem(LIKED_KEY)||'[]');}catch{return[];}}
 function isLiked(id){return getLiked().includes(String(id));}
 function setLiked(id){const l=getLiked();if(!l.includes(String(id))){l.push(String(id));try{localStorage.setItem(LIKED_KEY,JSON.stringify(l));}catch{}}}
-function getLikeCount(id){return allLikes[String(id)]||0;}
+// Local like counts persist across reloads until sheet syncs
+function getLocalLikes(){try{return JSON.parse(localStorage.getItem(LOCAL_LIKES_KEY)||'{}');}catch{return{};}}
+function setLocalLike(id,count){try{const ll=getLocalLikes();ll[String(id)]=count;localStorage.setItem(LOCAL_LIKES_KEY,JSON.stringify(ll));}catch{}}
+function getLikeCount(id){
+  const sid=String(id);
+  const sheetCount=allLikes[sid]||0;
+  const localLikes=getLocalLikes();
+  // If user already liked locally but sheet hasn't updated yet, show sheet+1
+  if(isLiked(sid)&&localLikes[sid]!==undefined)return Math.max(sheetCount,localLikes[sid]);
+  return sheetCount;
+}
 function toggleLike(essayId,btn){
   if(isLiked(essayId)){alert(t('You have already liked this essay.','你已经点过赞了。'));return;}
   btn.disabled=true;
   setLiked(essayId);
   const newCount=(allLikes[essayId]||0)+1;
   allLikes[essayId]=newCount;
+  setLocalLike(essayId,newCount);
   btn.classList.add('liked');
-  btn.innerHTML=`\u2665 ${newCount}`;
-  fetch(`${SUPA_URL}/rest/v1/likes`, {
-    method:'POST',
-    headers: SUPA_HEADERS,
-    body: JSON.stringify({ essay_id: String(essayId) })
-  }).catch(()=>{});
+  btn.innerHTML=`\u2665 ${newCount} ${t('likes','\u70b9\u8d5e')}`;
+  const formData=new FormData();
+  formData.append('action','like');formData.append('essay_id',essayId);
+  fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',body:formData}).catch(()=>{});
   btn.disabled=false;
 }
 
@@ -1647,14 +1641,12 @@ function loadArticleComments(id){
   const empty=document.getElementById('article-comments-empty');
   if(!list)return;
   list.innerHTML='';loading.textContent=t('Loading comments…','\u52a0\u8f7d\u4e2d\u2026');loading.style.display='block';if(empty)empty.classList.add('hidden');
-  fetch(`${SUPA_URL}/rest/v1/comments?topic_id=eq.article_${encodeURIComponent(id)}&order=created_at.asc`, {
-    headers: SUPA_HEADERS
-  })
+  fetch(APPS_SCRIPT_URL+'?topic_id=article_'+encodeURIComponent(id))
     .then(r=>r.json())
     .then(rows=>{
       loading.style.display='none';
       if(!rows||!rows.length){if(empty)empty.classList.remove('hidden');return;}
-      list.innerHTML=rows.map(c=>`<div class="comment-box-art"><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px"><span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600">${escHtml(c.name||'Anonymous')}</span>${c.grade?`<span style="font-size:11px;color:var(--ink3);font-family:'Source Serif 4',serif">${escHtml(c.grade)}</span>`:''}<span style="font-size:11px;color:var(--ink4);margin-left:auto;font-family:'Source Serif 4',serif">${formatDate(c.created_at)}</span></div><div style="font-size:14px;color:var(--ink2);line-height:1.75">${escHtml(c.content||'').replace(/\n/g,'<br>')}</div></div>`).join('');
+      list.innerHTML=rows.map(c=>`<div class="comment-box-art"><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px"><span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600">${escHtml(c.name||'Anonymous')}</span>${c.grade?`<span style="font-size:11px;color:var(--ink3);font-family:'Source Serif 4',serif">${escHtml(c.grade)}</span>`:''}<span style="font-size:11px;color:var(--ink4);margin-left:auto;font-family:'Source Serif 4',serif">${formatDate(c.timestamp)}</span></div><div style="font-size:14px;color:var(--ink2);line-height:1.75">${escHtml(c.content||'').replace(/\n/g,'<br>')}</div></div>`).join('');
     })
     .catch(()=>{loading.style.display='none';});
 }
@@ -1669,13 +1661,11 @@ function submitArticleComment(){
   if(!name){errEl.textContent=t('Please enter your name.','请填写姓名。');return;}
   if(!content||content.length<5){errEl.textContent=t('Comment too short.','评论太短。');return;}
   btn.disabled=true;btn.textContent=t('Posting…','发布中…');
-  fetch(`${SUPA_URL}/rest/v1/comments`, {
-    method:'POST',
-    headers: SUPA_HEADERS,
-    body: JSON.stringify({ topic_id: 'article_'+currentArticleId, name, grade, content })
-  })
-    .then(r=>{ if(!r.ok) throw new Error('Failed'); return r.json(); })
-    .then(()=>{sucEl.classList.remove('hidden');sucEl.textContent=t('✓ Comment posted!','✓ 评论成功！');document.getElementById('ac-name').value='';document.getElementById('ac-grade').value='';document.getElementById('ac-text').value='';setTimeout(()=>loadArticleComments(currentArticleId),1000);})
+  const formData=new FormData();
+  formData.append('topic_id','article_'+currentArticleId);
+  formData.append('name',name);formData.append('grade',grade);formData.append('content',content);
+  fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',body:formData})
+    .then(()=>{sucEl.classList.remove('hidden');document.getElementById('ac-name').value='';document.getElementById('ac-grade').value='';document.getElementById('ac-text').value='';setTimeout(()=>loadArticleComments(currentArticleId),1500);})
     .catch(()=>{errEl.textContent=t('Error. Please try again.','错误，请重试。');})
     .finally(()=>{btn.disabled=false;btn.textContent='Post →';});
 }
@@ -1753,8 +1743,7 @@ const d=new Date();
 document.getElementById('masthead-date').textContent=
   d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+
   '  \u00b7  '+d.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
-fetchLikeCounts().then(()=>fetchAll());
-
+fetchAll();
 </script>
 </body>
 </html>
