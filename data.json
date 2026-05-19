@@ -1,18 +1,21 @@
 {
   "essays": [  
-  "id": "4",
-  "title_en": "文章英文标题",
-  "title_zh": "文章中文标题",
-  "author": "作者名",
+  {
+  "id": "1",
+  "title_en": "The Theoretical Revise and Research",
+  "title_zh": "",
+  "author": "Chenyu Wang",
   "grade": "Grade 11",
   "discipline": "Physics",
   "style": "Professional",
-  "words": "1000",
-  "abstract_en": "摘要英文",
-  "abstract_zh": "摘要中文",
-  "body_en": "正文内容",
+  "words": "9767",
+  "abstract_en": "这里写摘要，显示在首页预览",
+  "abstract_zh": "",
+  "body_en": "",
+  "pdf_url": "https://你的腾讯文档或Google Doc链接",
   "featured": "TRUE",
   "month_best": "FALSE"
+}
   ],
   "forum": [
   ],
