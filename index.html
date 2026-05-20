@@ -358,6 +358,11 @@ body{font-family:'EB Garamond','Source Serif 4','Noto Serif SC',Georgia,serif;ba
     <button class="disc-btn" onclick="filterHome('Biology')" data-en="Biology" data-zh="生物">Biology</button>
     <button class="disc-btn" onclick="filterHome('Chemistry')" data-en="Chemistry" data-zh="化学">Chemistry</button>
     <button class="disc-btn" onclick="filterHome('Economics')" data-en="Economics" data-zh="经济">Economics</button>
+    <button class="disc-btn" onclick="filterHome('Mathematics')" data-en="Mathematics" data-zh="数学">Mathematics</button>
+    <button class="disc-btn" onclick="filterHome('Sociology')" data-en="Sociology" data-zh="社会学">Sociology</button>
+    <button class="disc-btn" onclick="filterHome('Psychology')" data-en="Psychology" data-zh="心理学">Psychology</button>
+    <button class="disc-btn" onclick="filterHome('Geology')" data-en="Geology" data-zh="地质学">Geology</button>
+    <button class="disc-btn" onclick="filterHome('History')" data-en="History" data-zh="历史">History</button>
   </div>
   <div class="featured-header">
     <div class="section-label" data-en="Featured Essays" data-zh="精选文章">Featured Essays</div>
@@ -511,7 +516,9 @@ body{font-family:'EB Garamond','Source Serif 4','Noto Serif SC',Georgia,serif;ba
             <option>Literature / 文学</option><option>Poetry / 诗歌</option>
             <option>Philosophy / 哲学</option><option>Physics / 物理</option>
             <option>Biology / 生物</option><option>Chemistry / 化学</option>
-            <option>Economics / 经济</option>
+            <option>Economics / 经济</option><option>Mathematics / 数学</option>
+            <option>Sociology / 社会学</option><option>Psychology / 心理学</option>
+            <option>Geology / 地质学</option><option>History / 历史</option>
           </select>
         </div>
         <div class="form-group">
@@ -564,6 +571,11 @@ body{font-family:'EB Garamond','Source Serif 4','Noto Serif SC',Georgia,serif;ba
     <button class="disc-btn" onclick="filterBrowse('Biology')" data-en="Biology" data-zh="生物">Biology</button>
     <button class="disc-btn" onclick="filterBrowse('Chemistry')" data-en="Chemistry" data-zh="化学">Chemistry</button>
     <button class="disc-btn" onclick="filterBrowse('Economics')" data-en="Economics" data-zh="经济">Economics</button>
+    <button class="disc-btn" onclick="filterBrowse('Mathematics')" data-en="Mathematics" data-zh="数学">Mathematics</button>
+    <button class="disc-btn" onclick="filterBrowse('Sociology')" data-en="Sociology" data-zh="社会学">Sociology</button>
+    <button class="disc-btn" onclick="filterBrowse('Psychology')" data-en="Psychology" data-zh="心理学">Psychology</button>
+    <button class="disc-btn" onclick="filterBrowse('Geology')" data-en="Geology" data-zh="地质学">Geology</button>
+    <button class="disc-btn" onclick="filterBrowse('History')" data-en="History" data-zh="历史">History</button>
   </div>
   <div class="search-bar">
     <input class="form-input" type="text" id="search-input" placeholder="Search essays… / 搜索文章…" oninput="renderBrowse()">
@@ -1328,7 +1340,15 @@ function renderHome(){
     document.getElementById('home-award-btn').onclick=()=>openArticle(best,'home');
     document.getElementById('home-award-btn').textContent=t('Read \u2192','\u9605\u8bfb \u2192');
   }else{award.classList.add('hidden');}
-  let filtered=homeFilter?allEssays.filter(e=>e.discipline===homeFilter):allEssays;
+  // Only show essays marked featured=true in the featured grid
+  const isFeatured=e=>{const v=(e.featured||'').toLowerCase();return v==='true'||v==='1';};
+  let pool=allEssays.filter(isFeatured);
+  let filtered=homeFilter?pool.filter(e=>e.discipline===homeFilter):pool;
+  // Fall back to all essays if none are marked featured
+  if(!filtered.length){
+    const allFiltered=homeFilter?allEssays.filter(e=>e.discipline===homeFilter):allEssays;
+    filtered=allFiltered;
+  }
   if(!filtered.length){featured.style.display='none';empty.classList.remove('hidden');return;}
   empty.classList.add('hidden');
   const main=filtered[0],sides=filtered.slice(1,4);
