@@ -46,9 +46,10 @@ body{font-family:'EB Garamond','Source Serif 4','Noto Serif SC',Georgia,serif;ba
 .essay-tag.professional{color:var(--forest);border:0.5px solid var(--forest);background:var(--forest-light)}
 .essay-tag.creative{color:var(--red);border:0.5px solid var(--red);background:var(--red-light)}
 .essay-tag.neutral{color:var(--gold);border:0.5px solid var(--gold);background:var(--gold-light)}
-.discipline-row{display:flex;border:0.5px solid var(--paper4);border-radius:2px;margin-bottom:32px;overflow:hidden;flex-wrap:wrap;background:var(--paper2)}
-.disc-btn{flex:1;background:none;border:none;border-right:0.5px solid var(--paper4);padding:9px 6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);cursor:pointer;font-family:'Source Serif 4',serif;transition:all .2s;text-align:center;min-width:60px}
-.disc-btn:last-child{border-right:none}
+.discipline-row{display:grid;grid-template-columns:repeat(7,1fr);border:0.5px solid var(--paper4);border-radius:2px;margin-bottom:32px;background:var(--paper2)}
+.disc-btn{background:none;border:none;border-right:0.5px solid var(--paper4);border-bottom:0.5px solid var(--paper4);padding:9px 6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);cursor:pointer;font-family:'Source Serif 4',serif;transition:all .2s;text-align:center}
+.disc-btn:nth-child(7n){border-right:none}
+.disc-btn:nth-last-child(-n+6){border-bottom:none}
 .disc-btn:hover{background:var(--paper3)}
 .disc-btn.active{background:var(--ink);color:var(--paper)}
 .featured-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;padding-bottom:10px;border-bottom:1.5px solid var(--ink)}
@@ -329,7 +330,7 @@ body{font-family:'EB Garamond','Source Serif 4','Noto Serif SC',Georgia,serif;ba
   <button class="nav-btn active" onclick="showSection('home')" data-en="Home" data-zh="首页">Home</button>
   <button class="nav-btn" onclick="showSection('submit')" data-en="Submit" data-zh="投稿">Submit</button>
   <button class="nav-btn" onclick="showSection('browse')" data-en="Browse Essays" data-zh="浏览文章">Browse Essays</button>
-  <button class="nav-btn forum-btn" onclick="showSection('forum')" data-en="Philosophy Forum" data-zh="哲学论坛">Philosophy Forum</button>
+  <button class="nav-btn forum-btn" onclick="showSection('forum')" data-en="Physics & Philosophy Forum" data-zh="物理与哲学论坛">Philosophy Forum</button>
   <button class="nav-btn" onclick="showSection('discussion')" data-en="About &amp; Resources" data-zh="关于与资源">About &amp; Resources</button>
   <button class="nav-btn" onclick="showSection('activity')" style="color:var(--red)" data-en="Activities" data-zh="活动">Activities</button>
 </nav>
@@ -434,7 +435,7 @@ body{font-family:'EB Garamond','Source Serif 4','Noto Serif SC',Georgia,serif;ba
           <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);font-family:'Source Serif 4',serif;margin-bottom:8px" data-en="More Features" data-zh="更多功能">More Features</div>
           <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:10px;line-height:1.3" data-en="Forum · Activities · About" data-zh="哲学论坛 · 活动专区 · 关于我们">Forum · Activities · About</div>
           <div style="font-size:13px;color:var(--ink2);line-height:1.75">
-            <div style="margin-bottom:9px"><strong style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);font-family:'Source Serif 4',serif" data-en="Philosophy Forum" data-zh="哲学论坛">Philosophy Forum</strong><p data-en="Open discussion space. No essay needed — comment on topics posted by our editors. Anyone can participate using their name and grade." data-zh="开放讨论空间。无需投稿——在编辑发布的话题下留名评论即可参与。">Open discussion. Comment on editor-posted topics using your name.</p></div>
+            <div style="margin-bottom:9px"><strong style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);font-family:'Source Serif 4',serif" data-en="Physics & Philosophy Forum" data-zh="物理与哲学论坛">Philosophy Forum</strong><p data-en="Open discussion space. No essay needed — comment on topics posted by our editors. Anyone can participate using their name and grade." data-zh="开放讨论空间。无需投稿——在编辑发布的话题下留名评论即可参与。">Open discussion. Comment on editor-posted topics using your name.</p></div>
             <div style="margin-bottom:9px"><strong style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);font-family:'Source Serif 4',serif" data-en="Monthly Activities" data-zh="每月活动">Monthly Activities</strong><p data-en="Monthly themed challenges. Submit an essay or video. Top 3 entries are featured on the homepage and receive special recognition from the editorial team." data-zh="每月主题挑战。提交文章或视频。前三名在首页展示并获编辑团队特殊奖励。">Monthly challenges. Top 3 featured on homepage with special recognition.</p></div>
             <div><strong style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-family:'Source Serif 4',serif" data-en="About &amp; Resources" data-zh="关于与资源">About &amp; Resources</strong><p data-en="Find the editorial team, writing resources, contact info. You can also like essays, leave comments on articles, give feedback, and subscribe for new essay notifications." data-zh="了解编辑团队、写作资源和联系方式。你还可以点赞文章、发表评论、提交反馈，并订阅更新通知。">Editorial team, resources, contact. Like, comment, subscribe.</p></div>
           </div>
@@ -516,9 +517,12 @@ body{font-family:'EB Garamond','Source Serif 4','Noto Serif SC',Georgia,serif;ba
             <option>Literature / 文学</option><option>Poetry / 诗歌</option>
             <option>Philosophy / 哲学</option><option>Physics / 物理</option>
             <option>Biology / 生物</option><option>Chemistry / 化学</option>
-            <option>Economics / 经济</option><option>Mathematics / 数学</option>
-            <option>Sociology / 社会学</option><option>Psychology / 心理学</option>
-            <option>Geology / 地质学</option><option>History / 历史</option>
+            <option>Economics / 经济</option>
+            <option>Mathematics / 数学</option>
+            <option>Sociology / 社会学</option>
+            <option>Psychology / 心理学</option>
+            <option>Geology / 地质学</option>
+            <option>History / 历史</option>
           </select>
         </div>
         <div class="form-group">
@@ -593,7 +597,7 @@ body{font-family:'EB Garamond','Source Serif 4','Noto Serif SC',Georgia,serif;ba
 <!-- FORUM -->
 <div class="section" id="section-forum">
   <div class="forum-hero">
-    <div class="forum-hero-title" data-en="Philosophy Forum" data-zh="哲学论坛">Philosophy Forum</div>
+    <div class="forum-hero-title" data-en="Physics & Philosophy Forum" data-zh="物理与哲学论坛">Philosophy Forum</div>
     <div class="forum-hero-sub" data-en="Philosophy begins in everyday experience. Share your observations, questions, and arguments — no expertise required, only honest thinking." data-zh="哲学始于日常经验。分享你的观察、疑问与论点——无需专业背景，只需真诚思考。">Philosophy begins in everyday experience. Share your observations, questions, and arguments — no expertise required, only honest thinking.</div>
   </div>
   <div class="section-header">
@@ -1340,18 +1344,14 @@ function renderHome(){
     document.getElementById('home-award-btn').onclick=()=>openArticle(best,'home');
     document.getElementById('home-award-btn').textContent=t('Read \u2192','\u9605\u8bfb \u2192');
   }else{award.classList.add('hidden');}
-  // Only show essays marked featured=true in the featured grid
-  const isFeatured=e=>{const v=(e.featured||'').toLowerCase();return v==='true'||v==='1';};
-  let pool=allEssays.filter(isFeatured);
-  let filtered=homeFilter?pool.filter(e=>e.discipline===homeFilter):pool;
-  // Fall back to all essays if none are marked featured
-  if(!filtered.length){
-    const allFiltered=homeFilter?allEssays.filter(e=>e.discipline===homeFilter):allEssays;
-    filtered=allFiltered;
-  }
+  const featuredEssays=allEssays.filter(e=>{const v=(e.featured||'').toLowerCase();return v==='true'||v==='1';});
+  let filtered=homeFilter?featuredEssays.filter(e=>e.discipline===homeFilter):featuredEssays;
   if(!filtered.length){featured.style.display='none';empty.classList.remove('hidden');return;}
   empty.classList.add('hidden');
-  const main=filtered[0],sides=filtered.slice(1,4);
+  const featuredIdx=filtered.findIndex(e=>{const v=(e.featured||'').toLowerCase();return v==='true'||v==='1';});
+  const main=featuredIdx>=0?filtered[featuredIdx]:filtered[0];
+  const rest=filtered.filter((_,i)=>i!==Math.max(featuredIdx,0));
+  const sides=rest.slice(0,3);
   featured.innerHTML=`
     <div class="featured-main">
       <span class="essay-tag ${tagCls(main.style)}">${main.discipline} \u00b7 ${main.style}</span>
@@ -1453,8 +1453,8 @@ function renderForum(){
     </div>`).join('');
 }
 
-// THREAD & COMMENTS
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuzsAW58LyAWZ_v7pVyjN1dJMNS2Ek8QLbCqXQOXO6HjhbyepCnY3RmD5fM6WfV5ge/exec';
+// THREAD & COMMENTS — Netlify Functions proxy (GitHub Issues backend)
+const COMMENTS_API = '/api/comments';
 let currentTopicId = '';
 
 function openThread(topic){
@@ -1477,7 +1477,7 @@ function loadComments(topicId){
   const empty = document.getElementById('comments-empty');
   const countEl = document.getElementById('comment-count');
   list.innerHTML=''; loading.classList.remove('hidden'); empty.classList.add('hidden');
-  fetch(APPS_SCRIPT_URL + '?topic_id=' + encodeURIComponent(topicId))
+  fetch(COMMENTS_API + '?topic_id=' + encodeURIComponent(topicId))
     .then(r=>r.json())
     .then(rows=>{
       loading.classList.add('hidden');
@@ -1511,25 +1511,23 @@ function submitComment(){
   if(!content){errEl.textContent=t('Please write a comment.','请填写留言内容。');return;}
   if(content.length<10){errEl.textContent=t('Comment is too short (min 10 characters).','留言太短，请至少写10个字。');return;}
   btn.disabled=true; btn.textContent=t('Posting…','发布中…');
-  // Use no-cors mode to avoid CORS issues with Apps Script
-  const formData = new FormData();
-  formData.append('topic_id', currentTopicId);
-  formData.append('name', name);
-  formData.append('grade', grade);
-  formData.append('content', content);
-  fetch(APPS_SCRIPT_URL, {
+  fetch(COMMENTS_API, {
     method:'POST',
-    mode:'no-cors',
-    body: formData
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ topic_id: currentTopicId, name, grade, content })
   })
-  .then(()=>{
-    // no-cors means we can't read the response, but if no error thrown it worked
-    sucEl.classList.remove('hidden');
-    sucEl.textContent=t('✓ Comment posted! Reloading…','✓ 留言成功！正在刷新…');
-    document.getElementById('comment-name').value='';
-    document.getElementById('comment-grade').value='';
-    document.getElementById('comment-text').value='';
-    setTimeout(()=>loadComments(currentTopicId), 2000);
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.success){
+      sucEl.classList.remove('hidden');
+      sucEl.textContent=t('✓ Comment posted! Reloading…','✓ 留言成功！正在刷新…');
+      document.getElementById('comment-name').value='';
+      document.getElementById('comment-grade').value='';
+      document.getElementById('comment-text').value='';
+      setTimeout(()=>loadComments(currentTopicId), 2000);
+    } else {
+      errEl.textContent = data.error || t('Failed. Please try again.','发送失败，请重试。');
+    }
   })
   .catch(()=>{ errEl.textContent=t('Network error. Please try again.','网络错误，请重试。'); })
   .finally(()=>{ btn.disabled=false; btn.textContent=t('Post Comment →','发布留言 →'); });
@@ -1648,9 +1646,6 @@ function toggleLike(essayId,btn){
   setLocalLike(essayId,newCount);
   btn.classList.add('liked');
   btn.innerHTML=`\u2665 ${newCount} ${t('likes','\u70b9\u8d5e')}`;
-  const formData=new FormData();
-  formData.append('action','like');formData.append('essay_id',essayId);
-  fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',body:formData}).catch(()=>{});
   btn.disabled=false;
 }
 
@@ -1661,7 +1656,7 @@ function loadArticleComments(id){
   const empty=document.getElementById('article-comments-empty');
   if(!list)return;
   list.innerHTML='';loading.textContent=t('Loading comments…','\u52a0\u8f7d\u4e2d\u2026');loading.style.display='block';if(empty)empty.classList.add('hidden');
-  fetch(APPS_SCRIPT_URL+'?topic_id=article_'+encodeURIComponent(id))
+  fetch(COMMENTS_API+'?topic_id=article_'+encodeURIComponent(id))
     .then(r=>r.json())
     .then(rows=>{
       loading.style.display='none';
@@ -1681,13 +1676,25 @@ function submitArticleComment(){
   if(!name){errEl.textContent=t('Please enter your name.','请填写姓名。');return;}
   if(!content||content.length<5){errEl.textContent=t('Comment too short.','评论太短。');return;}
   btn.disabled=true;btn.textContent=t('Posting…','发布中…');
-  const formData=new FormData();
-  formData.append('topic_id','article_'+currentArticleId);
-  formData.append('name',name);formData.append('grade',grade);formData.append('content',content);
-  fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',body:formData})
-    .then(()=>{sucEl.classList.remove('hidden');document.getElementById('ac-name').value='';document.getElementById('ac-grade').value='';document.getElementById('ac-text').value='';setTimeout(()=>loadArticleComments(currentArticleId),1500);})
-    .catch(()=>{errEl.textContent=t('Error. Please try again.','错误，请重试。');})
-    .finally(()=>{btn.disabled=false;btn.textContent='Post →';});
+  fetch(COMMENTS_API,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ topic_id:'article_'+currentArticleId, name, grade, content })
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.success){
+      sucEl.classList.remove('hidden');
+      document.getElementById('ac-name').value='';
+      document.getElementById('ac-grade').value='';
+      document.getElementById('ac-text').value='';
+      setTimeout(()=>loadArticleComments(currentArticleId),1500);
+    } else {
+      errEl.textContent = data.error || t('Error. Please try again.','错误，请重试。');
+    }
+  })
+  .catch(()=>{errEl.textContent=t('Error. Please try again.','错误，请重试。');})
+  .finally(()=>{btn.disabled=false;btn.textContent='Post →';});
 }
 
 // FEEDBACK
